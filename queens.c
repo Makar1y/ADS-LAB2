@@ -70,14 +70,3 @@ int **find_queens(int size, int _timeout, int full_search)
     {
     }
 }
-
-int **find_queens(int size, int **desk, int _timeout, int start_time, int full_search)
-{
-    time_t start = time(0);
-    int desk[size][size];
-    int timeout = _timeout ? _timeout : -1;
-
-    while (timeout < 0 || time(0) - timeout <= start)
-    {
-    }
-}
