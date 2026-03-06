@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Results</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.results-count {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+.results-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.result-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 40px);
+    grid-template-rows: repeat(8, 40px);
+    border: 2px solid black;
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+}
+
+.white { background-color: #f0d9b5; }
+.black { background-color: #b58863; }
+
+.figures {
+    margin-top: 10px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Results</h1>

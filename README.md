@@ -9,16 +9,10 @@ Išdėstyti šachmatų lentoje 5 karalienes taip, kad kiekvienas langelis būtų
 ## Algoritmo aprašymas
 Programa naudoja perrinkimo (backtracking) metodą. 
 * **Režimai**: Palaikomi `fullSearch`, `firstMatchSearch` ir `heuristic` režimai per komandinę eilutę.
-* **Euristika**: [Jei naudojate, nurodykite šaltinį ir veikimo principą be tuščiažodžiavimo].
+* **Euristika**: [nurodykite šaltinį ir veikimo principą be tuščiažodžiavimo].
 
 
-# --- FILE: main.c (Usage Snippet) ---
-/* Reikalaujamas Usage išvedimas */
-fprintf(stderr, "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-timeout miliseconds]\n", argv[0]);
-
-# --- FILE: PSP.xlsx Structure Checklist ---
-# Privalomi lakštai (sheets):
-# 1. LFF (Lentelių formų failas)
-# 2. KPS (Kintamųjų paaiškinimų sąrašas)
-# 3. DTS (Duomenų testavimo sąrašas) - gali būti užpildytas nepilnai
-# 4. DFF (Duomenų failų formatai) - gali būti užpildytas nepilnai
+Usage:
+```
+main.exe [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-timeout miliseconds]
+```
