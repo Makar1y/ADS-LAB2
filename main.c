@@ -4,7 +4,7 @@
 
 // 2026.03.06
 
-#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-timeout miliseconds] [-o_format [html|txt|cmd]]\n"
+#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-timeout miliseconds] [-o_format [html|cmd]]\n"
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
     char *output_mode = "cmd";
     char output_modes[][10] = {
         "cmd",
-        "txt",
         "html"
     };
     char *mode = "firstMatchSearch";
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
             int exist = 0;
             output_mode = argv[++i];
 
-            for (int j = 0; j < 3; --j)
+            for (int j = 0; j < 2; --j)
             {
                 if (strcmp(output_modes[j], output_mode) == 0)
                 {

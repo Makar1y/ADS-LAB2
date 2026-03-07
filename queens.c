@@ -4,31 +4,29 @@
 
 #include "utils.h"
 
+#define True 1
+#define False 0
+
 // States
 enum
 {
     clear,
-    placed,
-    controlled
+    placed
 };
 
 typedef struct {
     int row, col;
 } Cell;
 
-void place_queen(int **desk, int size, int row, int col)
+int is_controlled(int **desk, int size, int row, int col)
 {
     desk[row][col] = placed;
 
     for (int i = 0; i < size; ++i)
     {
-        if (desk[i][col] == clear)
+        if (desk[i][col] == placed || desk[row][i] == placed)
         {
-            desk[i][col] = controlled;
-        }
-        if (desk[row][i] == clear)
-        {
-            desk[row][i] = controlled;
+            return True;
         }
     }
 
@@ -38,27 +36,26 @@ void place_queen(int **desk, int size, int row, int col)
 
     while (dig1.col + dig1.row + dig2.row + dig2.col < size * 4 ) {
         if (dig1.row < size && dig1.col < size) {
-            if (desk[dig1.row][dig1.col] == clear)
+            if (desk[dig1.row][dig1.col] == placed)
             {
-                desk[dig1.row][dig1.col] = controlled;
+                return True;
             }
             ++dig1.row;
             ++dig1.col;
         }
         if (dig2.row < size && dig2.col < size) {
-            if (desk[dig2.row][dig2.col] == clear)
+            if (desk[dig2.row][dig2.col] == placed)
             {
-                desk[dig2.row][dig2.col] = controlled;
+                return True;
             }
             --dig1.row;
             ++dig1.col;
         }
     }
+
+    return 0;
 }
 
-void delete_queen(int **desk, int size, int row, int col)
-{
-}
 
 int **find_queens(int size, int _timeout, int full_search)
 {
