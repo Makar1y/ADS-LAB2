@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     if (mode == 2)
         printf(" (Number: %d)", heuristic_no);
     printf("\nTimeout: %ld ms\n", timeout_ms);
-    printf("Desk size: %dx%d\n\n", desk_size, desk_size);
-    printf("Output format: %s", output_modes[output_mode]);
+    printf("Desk size: %dx%d\n", desk_size, desk_size);
+    printf("Output format: %s\n\n", output_modes[output_mode]);
 
     if (mode == 2)
     {
