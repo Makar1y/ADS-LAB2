@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define BUFFER_SIZE 500
+#include "utils.h"
 
-void results_to_html(int ***results, int num_of_results, int desk_size)
+void results_to_html(int ***results, int num_of_results, int num_of_pieces, int desk_size)
 {
     if (!results)
     {
@@ -31,7 +31,7 @@ void results_to_html(int ***results, int num_of_results, int desk_size)
     for (int r = 0; r < num_of_results; ++r)
     {
         int **desk = calloc(desk_size, desk_size * sizeof(int));
-        for (int i = 0; i < num_of_results; ++i) {
+        for (int i = 0; i < num_of_pieces; ++i) {
             desk[results[r][i][0]][results[r][i][1]] = 1;
         }
 
@@ -53,4 +53,28 @@ void results_to_html(int ***results, int num_of_results, int desk_size)
     }
 
     printf("</div></body></html>");
+}
+
+
+void results_to_cmd(int ***results, int num_of_results, int num_of_pieces)
+{
+    if (!results)
+    {
+        #ifdef DEBUG
+            assert(results);
+        #endif
+        return;
+    }
+
+    printf("Solutions found: %d\n", num_of_results);
+
+    for (int r = 0; r < num_of_results; ++r)
+    {
+        printf("Result No. %d\n", r + 1);
+        printf("[");
+        for (int i = 0; i < num_of_pieces; ++i) {
+            printf("%c%d", results[r][i][0] + 97, results[r][i][1]);
+        }
+        printf("]\n\n");
+    }
 }

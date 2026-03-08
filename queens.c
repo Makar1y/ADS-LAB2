@@ -25,13 +25,6 @@ typedef struct {
     int ended;
 } Search;
 
-typedef struct {
-    int duration;
-    int ***results;
-    int result_code;
-    int how_solutions;
-} Results;
-
 
 int is_controlled(int **desk, int desk_size, int row, int col)
 {
@@ -74,6 +67,10 @@ int is_controlled(int **desk, int desk_size, int row, int col)
 
 Results **find_queens(int desk_size, int timeout, int is_full_search)
 {
+    if (desk_size <= 0)
+    {
+        return INVALID_INPUT;
+    }
     Search search;
     int result_code;
     int end_time;
@@ -89,12 +86,17 @@ Results **find_queens(int desk_size, int timeout, int is_full_search)
     result_code = find(&search);
     end_time = time(0);
 
+    if (result_code == TIMEOUT_CODE )
+    {
+        printf("Timeout reached...\n\n");
+    }
+
     Results *results_data = malloc(sizeof(Results));
 
     results_data->duration = end_time - search.start_time;
-    results_data->result_code = result_code;
     results_data->results = search.results;
     results_data->how_solutions = search.cur_solution;
+    results_data->desk_size = desk_size;
 
     free(search.desk);
 
@@ -157,6 +159,17 @@ int find(Search *search)
     return TIMEOUT_CODE;
 }
 
-void print_results(Results *results) {
-    
+int print_results(Results *results, int output_format) {
+    if (!results) {
+        return INVALID_INPUT;
+    }
+
+    printf("Search duration: %s ms", results->duration);
+
+    if (output_format) {
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size);
+    } else {
+        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM);
+    }
+    return SUCCESS_CODE;
 }
