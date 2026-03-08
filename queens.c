@@ -7,28 +7,27 @@
 #include "utils.h"
 #include "queens.h"
 
-#define QUEENS_NUM 5
-
-typedef struct {
+typedef struct
+{
     int row, col;
 } Cell;
 
-typedef struct {
+typedef struct
+{
     int **desk;
     int desk_size;
-    int start_time;
+    time_t start_time;
     int timeout;
     int is_full_search;
 
-    int ***results;
+    int (*results)[QUEENS_NUM][2];
     int cur_solution;
     int cur_level;
     int ended;
     int return_code;
 } Search;
 
-void find(Search*);
-
+void find(Search *);
 
 int is_controlled(int **desk, int desk_size, int row, int col)
 {
@@ -44,8 +43,13 @@ int is_controlled(int **desk, int desk_size, int row, int col)
     Cell dig1 = {row - max_coord, col - max_coord};
     Cell dig2 = {0, row + col};
 
-    while (dig1.col + dig1.row + dig2.row + dig2.col < desk_size * 4 ) {
-        if (dig1.row < desk_size && dig1.col < desk_size) {
+    while (((dig1.col >= 0 && dig1.col < desk_size) &&
+            (dig1.row >= 0 && dig1.row < desk_size)) ||
+           ((dig2.col >= 0 && dig2.col < desk_size) &&
+            (dig2.row >= 0 && dig2.row < desk_size)))
+    {
+        if (dig1.row < desk_size && dig1.row >= 0 && dig1.col < desk_size && dig1.col >= 0)
+        {
             if (desk[dig1.row][dig1.col])
             {
                 return True;
@@ -53,19 +57,19 @@ int is_controlled(int **desk, int desk_size, int row, int col)
             ++dig1.row;
             ++dig1.col;
         }
-        if (dig2.row < desk_size && dig2.col < desk_size) {
+        if (dig2.row < desk_size && dig2.col < desk_size && dig2.row >= 0 && dig2.col >= 0)
+        {
             if (desk[dig2.row][dig2.col])
             {
                 return True;
             }
-            --dig1.row;
-            ++dig1.col;
+            --dig2.row;
+            ++dig2.col;
         }
     }
 
     return 0;
 }
-
 
 Results *find_queens(int desk_size, int timeout, int is_full_search)
 {
@@ -76,11 +80,17 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     }
     Search search = {0};
     int result_code;
-    int end_time;
+    time_t end_time;
 
-    search.desk = calloc(desk_size * desk_size, sizeof(int));
     search.desk_size = desk_size;
-    search.results = calloc(QUEENS_NUM, 2 * sizeof(int));
+    search.desk = malloc(desk_size * sizeof(int *));
+    for (int i = 0; i < desk_size; ++i)
+    {
+        search.desk[i] = calloc(desk_size, sizeof(int));
+    }
+
+    search.results = malloc(sizeof(int[QUEENS_NUM][2]) * 2);
+
     search.is_full_search = is_full_search;
     search.return_code = SUCCESS_CODE;
 
@@ -90,19 +100,19 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
         return NULL;
     }
 
-    search.timeout = timeout ? timeout : -1;
+    search.timeout = timeout ? timeout / 1000.f : -1;
     search.start_time = time(0);
 
-    #ifdef DEBUG
-        printf("Starting search...\n");
-    #endif
+#ifdef DEBUG
+    printf("Starting search...\n");
+#endif
 
     find(&search);
     end_time = time(0);
 
-    #ifdef DEBUG
-        printf("Search ended.\n");
-    #endif
+#ifdef DEBUG
+    printf("Search ended.\n");
+#endif
 
     result_code = search.return_code;
 
@@ -113,6 +123,8 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     else if (result_code == RUNTIME_ERROR)
     {
         fprintf(stderr, "Error occurred while finding solutions...\n\n");
+        for (int i = 0; i < desk_size; i++)
+            free(search.desk[i]);
         free(search.desk);
         free(search.results);
         return NULL;
@@ -125,6 +137,8 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     results_data->how_solutions = search.cur_solution;
     results_data->desk_size = desk_size;
 
+    for (int i = 0; i < desk_size; i++)
+        free(search.desk[i]);
     free(search.desk);
 
     return results_data;
@@ -132,11 +146,12 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
 
 void find(Search *search)
 {
-    #ifdef DEBUG
-        assert(search);
-    #endif
+#ifdef DEBUG
+    assert(search);
+#endif
 
-    if (search->ended) {
+    if (search->ended)
+    {
         return;
     }
 
@@ -145,36 +160,48 @@ void find(Search *search)
 
     if (search->timeout < 0 || time(0) - search->start_time <= search->timeout)
     {
-        for (int i = 0; i < search->desk_size; ++i) {
-            for (int j = 0; j < search->desk_size; ++j) {
-                if (!is_controlled(search->desk, search->desk_size, i, j)) 
+        for (int i = 0; i < search->desk_size; ++i)
+        {
+            for (int j = 0; j < search->desk_size; ++j)
+            {
+                if (!is_controlled(search->desk, search->desk_size, i, j))
                 {
                     search->desk[i][j] = 1;
                     search->results[search->cur_solution][search->cur_level][0] = i;
                     search->results[search->cur_solution][search->cur_level][1] = j;
 
-                    if(search->cur_level = QUEENS_NUM - 1)
+                    if (search->cur_level == QUEENS_NUM - 1)
                     {
                         if (!search->is_full_search)
                         {
                             search->ended = 1;
                             ++search->cur_solution;
                             return;
-                        } else {
-                            search->results = realloc(search->results, (search->cur_solution + 2) * QUEENS_NUM * 2 * sizeof(int));
-                            if (!search->results) {
+                        }
+                        else
+                        {
+
+                            void *tmp = realloc(search->results, sizeof(int[QUEENS_NUM][2]) * (search->cur_solution + 2));
+
+                            if (!tmp)
+                            {
                                 search->return_code = RUNTIME_ERROR;
                                 search->ended = 1;
                                 return;
                             }
 
-                            memcpy(search->results[search->cur_solution + 1], search->results[search->cur_solution], QUEENS_NUM * 2 * sizeof(int));
+                            search->results = tmp;
+
+                            memcpy(search->results[search->cur_solution + 1],
+                                   search->results[search->cur_solution],
+                                   sizeof(int[QUEENS_NUM][2]));
 
                             search->desk[i][j] = 0;
                             ++search->cur_solution;
                             continue;
                         }
-                    } else
+                    }
+                    else
                     {
                         ++search->cur_level;
                         find(search);
@@ -184,7 +211,8 @@ void find(Search *search)
             }
         }
 
-        if (search->cur_level == 0) {
+        if (search->cur_level == 0)
+        {
             return;
         }
 
@@ -196,17 +224,22 @@ void find(Search *search)
     return;
 }
 
-int print_results(Results *results, int output_format) {
-    if (!results) {
+int print_results(Results *results, int output_format)
+{
+    if (!results)
+    {
         fprintf(stderr, "Error(print results), NULL struct given...\n");
         return INVALID_INPUT;
     }
 
-    printf("Search duration: %d ms\n", results->duration);
+    printf("Search duration: %ld s\n", (long)results->duration);
 
-    if (output_format) {
+    if (output_format)
+    {
         results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size);
-    } else {
+    }
+    else
+    {
         results_to_cmd(results->results, results->how_solutions, QUEENS_NUM);
     }
     return SUCCESS_CODE;

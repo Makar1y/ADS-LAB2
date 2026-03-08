@@ -1,10 +1,12 @@
 #ifndef QUEENS_H
 #define QUEENS_H
 
+#define QUEENS_NUM 5
+
 typedef struct {
     int desk_size;
     int duration;
-    int ***results;
+    int (*results)[QUEENS_NUM][2];
     int how_solutions;
 } Results;
 

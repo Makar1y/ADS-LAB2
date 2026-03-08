@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-void results_to_html(int ***results, int num_of_results, int num_of_pieces, int desk_size)
+void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, int desk_size)
 {
     if (!results)
     {
@@ -50,7 +50,7 @@ void results_to_html(int ***results, int num_of_results, int num_of_pieces, int 
 }
 
 
-void results_to_cmd(int ***results, int num_of_results, int num_of_pieces)
+void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces)
 {
     if (!results)
     {
@@ -64,7 +64,7 @@ void results_to_cmd(int ***results, int num_of_results, int num_of_pieces)
         printf("Result No. %d\n", r + 1);
         printf("[");
         for (int i = 0; i < num_of_pieces; ++i) {
-            printf("%c%d", results[r][i][0] + 97, results[r][i][1]);
+            printf("%c%d,", results[r][i][0] + 97, results[r][i][1]);
         }
         printf("]\n\n");
     }
