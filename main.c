@@ -4,7 +4,7 @@
 
 // 2026.03.06
 
-#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-timeout miliseconds] [-o_format [html|cmd]]\n"
+#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-desk_size cells_number] [-timeout miliseconds] [-o_format [html|cmd]]\n"
 
 int main(int argc, char *argv[])
 {
@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     };
     int heuristic_no = 3;
     long timeout_ms = 300;
+    int desk_size = 8;
     FILE *input = stdin;
 
     if (argc < 1)
@@ -95,6 +96,12 @@ int main(int argc, char *argv[])
             timeout_ms = atol(argv[++i]);
             timeout_ms = abs(timeout_ms);
         }
+        
+        else if (strcmp(argv[i], "-desk_size") == 0 && i + 1 < argc)
+        {
+            desk_size = atol(argv[++i]);
+            desk_size = abs(desk_size);
+        }
     }
 
     // Inform the user about data
@@ -103,7 +110,14 @@ int main(int argc, char *argv[])
     printf("Search mode: %s", mode);
     if (strcmp(modes[2], mode) == 0)
         printf(" (Number: %d)", heuristic_no);
-    printf("\nTimeout: %ld ms\n\n", timeout_ms);
+    printf("\nTimeout: %ld ms\n", timeout_ms);
+    printf("Desk size: %dx%d\n\n", desk_size, desk_size);
+
+    if (strcmp(mode, "heuristic") == 0)
+    {
+        printf("Heuristic is not implemented yet...");
+        return 0;
+    }
 
     // TODO: Call solver logic here
 

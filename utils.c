@@ -4,7 +4,7 @@
 
 #define BUFFER_SIZE 500
 
-void results_to_html(int **results, int num_of_results, int desk_size)
+void results_to_html(int ***results, int num_of_results, int desk_size)
 {
     if (!results)
     {
@@ -30,6 +30,11 @@ void results_to_html(int **results, int num_of_results, int desk_size)
 
     for (int r = 0; r < num_of_results; ++r)
     {
+        int **desk = calloc(desk_size, desk_size * sizeof(int));
+        for (int i = 0; i < num_of_results; ++i) {
+            desk[results[r][i][0]][results[r][i][1]] = 1;
+        }
+
         printf("<div class=\"result-card\"><div class=\"chessboard\">");
 
         for (int i = 0; i < desk_size; ++i)
@@ -39,7 +44,7 @@ void results_to_html(int **results, int num_of_results, int desk_size)
                 // <div class="cell white">♛</div>
                 printf("<div class=\"cell %s\">%s</div>",
                         i + j % 2 ? "white" : "black",
-                        results[r][0] == i && results[r][1] == j ? "♛" : "");
+                        desk[i][j] ? "♛" : "");
 
             }
         }
