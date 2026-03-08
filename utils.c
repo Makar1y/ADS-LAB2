@@ -8,17 +8,11 @@ void results_to_html(int ***results, int num_of_results, int num_of_pieces, int 
 {
     if (!results)
     {
-#ifdef DEBUG
-        assert(results);
-#endif
         return;
     }
     char buffer[500];
 
     FILE *head = fopen("templates/head.html", "r");
-#ifdef DEBUG
-    assert(head);
-#endif
     while (fgets(buffer, BUFFER_SIZE, head))
     {
         printf("%s\n", buffer);
@@ -60,9 +54,6 @@ void results_to_cmd(int ***results, int num_of_results, int num_of_pieces)
 {
     if (!results)
     {
-        #ifdef DEBUG
-            assert(results);
-        #endif
         return;
     }
 

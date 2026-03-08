@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <assert.h>
 
 #include "utils.h"
 #include "queens.h"
@@ -70,9 +71,10 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
 {
     if (desk_size <= 0)
     {
+        fprintf(stderr, "Error, desk size must be positive integer...\n");
         return NULL;
     }
-    Search search;
+    Search search = {0};
     int result_code;
     int end_time;
 
@@ -82,11 +84,25 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     search.is_full_search = is_full_search;
     search.return_code = SUCCESS_CODE;
 
+    if (!search.desk || !search.results)
+    {
+        fprintf(stderr, "Error allocating memory...\n");
+        return NULL;
+    }
+
     search.timeout = timeout ? timeout : -1;
     search.start_time = time(0);
 
+    #ifdef DEBUG
+        printf("Starting search...\n");
+    #endif
+
     find(&search);
     end_time = time(0);
+
+    #ifdef DEBUG
+        printf("Search ended.\n");
+    #endif
 
     result_code = search.return_code;
 
@@ -96,7 +112,7 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     }
     else if (result_code == RUNTIME_ERROR)
     {
-        printf("Error occurred while finding solutions...\n\n");
+        fprintf(stderr, "Error occurred while finding solutions...\n\n");
         free(search.desk);
         free(search.results);
         return NULL;
@@ -117,7 +133,7 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
 void find(Search *search)
 {
     #ifdef DEBUG
-        assert(desk);
+        assert(search);
     #endif
 
     if (search->ended) {
@@ -182,10 +198,11 @@ void find(Search *search)
 
 int print_results(Results *results, int output_format) {
     if (!results) {
+        fprintf(stderr, "Error(print results), NULL struct given...\n");
         return INVALID_INPUT;
     }
 
-    printf("Search duration: %s ms\n", results->duration);
+    printf("Search duration: %d ms\n", results->duration);
 
     if (output_format) {
         results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size);

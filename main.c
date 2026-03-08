@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         "heuristic"
     };
     int heuristic_no = 3;
-    long timeout_ms = 300;
+    long timeout_ms = 3000;
     int desk_size = 8;
     FILE *input = stdin;
 
@@ -124,7 +124,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    // TODO: Call solver logic here
+    printf("--- Output ---\n");
+
     print_results(find_queens(desk_size, timeout_ms, mode), output_mode);
 
     if (input != stdin)
