@@ -117,7 +117,7 @@ void find_domination(Search *search, int start_index, int queens_placed, double 
         return;
     if (search->timeout > 0) {
         clock_t current_time = clock();
-        double elapsed_ms = ((double)(current_time - search->start_time) / CLOCKS_PER_SEC) * 10000;
+        double elapsed_ms = ((double)(current_time - search->start_time) / CLOCKS_PER_SEC) * 1000;
         
         if (elapsed_ms > search->timeout) {
             search->return_code = TIMEOUT_CODE;
