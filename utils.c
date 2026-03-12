@@ -26,7 +26,7 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
     printf("<div class=\"stats\">\n");
     printf("\t<div>Solutions Found: <strong>%d</strong></div>\n", num_of_results);
     printf("\t<div style=\"color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;\">\n");
-    printf("\t\tSearch Duration: %ld ms | Desk Size: %dx%d\n", duration, desk_size, desk_size);
+    printf("\t\tSearch Duration: %ld ms\n", duration, desk_size, desk_size);
     if (timedout) {
         printf("\t\t<br><span style=\"color: var(--queen-color); font-weight: 600;\">TIMEOUT! Exploration: %.2f%%</span>\n", progress * 100.0);
     }
