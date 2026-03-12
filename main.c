@@ -132,14 +132,14 @@ int main(int argc, char *argv[])
     }
 
     // Inform the user about data
-    printf("--- Execution Setup ---\n");
-    printf("Input source: %s\n", filename ? filename : "Standard Input");
-    printf("Search mode: %s", modes[mode]);
+    printf("<p>\n--- Execution Setup ---\n");
+    printf("<br> Input source: %s\n", filename ? filename : "Standard Input");
+    printf("<br> Search mode: %s", modes[mode]);
     if (mode == 2)
         printf(" (Number: %d)", heuristic_no);
-    printf("\nTimeout: %ld ms\n", timeout_ms);
-    printf("Desk size: %dx%d\n", desk_size, desk_size);
-    printf("Output format: %s\n\n", output_modes[output_mode]);
+    printf("\n<br> Timeout: %ld ms\n", timeout_ms);
+    printf("<br> Desk size: %dx%d\n", desk_size, desk_size);
+    printf("<br> Output format: %s\n</p>\n\n", output_modes[output_mode]);
 
     if (mode == 2)
     {

@@ -182,7 +182,7 @@ int print_results(Results * results, int output_format)
 
     if (output_format)
     {
-        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size);
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration);
     }
     else
     {
