@@ -7,9 +7,7 @@
 
 // 2026.03.06
 
-#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-desk_size cells_number] [-timeout miliseconds] [-o_format [html|cmd]]\n"
-
-
+#define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-desk_size cells_number] [-timeout miliseconds] [-of [html|cmd]]\n"
 
 int main(int argc, char *argv[])
 {
@@ -24,11 +22,11 @@ int main(int argc, char *argv[])
         "fullSearch",
         "heuristic"};
     int heuristic_no = 3;
-    long timeout_ms = -1;
+    long timeout_ms = 0;
     int desk_size = 8;
     FILE *input = stdin;
 
-    if (argc < 1)
+    if (argc <= 1)
     {
         fprintf(stderr, USAGE_MESSAGE, argv[0]);
         return 1;
@@ -66,7 +64,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            else if (strcmp(argv[i], "-o_format") == 0 && i + 1 < argc)
+            else if (strcmp(argv[i], "-of") == 0 && i + 1 < argc)
             {
                 int exist = 0;
                 char *tmp = argv[++i];
@@ -99,6 +97,14 @@ int main(int argc, char *argv[])
             {
                 desk_size = abs(atoi(argv[++i]));
             }
+            else if (strcmp(argv[i], "-") == 0)
+            {
+                if (scanf("%d %d %d %ld", &desk_size, &mode, &output_mode, &timeout_ms) != 4)
+                {
+                    printf("Invalid arguments count from file (should be 4)\n");
+                    exit(1);
+                };
+            }
             else
             {
                 fprintf(stderr, "Argument %s not recognized.\n", argv[i]);
@@ -116,10 +122,14 @@ int main(int argc, char *argv[])
                 perror("Error opening input file");
                 exit(1);
             }
+            if (fscanf(input, "%d %d %d %ld", &desk_size, &mode, &output_mode, &timeout_ms) != 4)
+            {
+                printf("Invalid arguments count from file (should be 4)\n");
+                exit(1);
+            };
+            fclose(input);
         }
     }
-
-
 
     // Inform the user about data
     printf("--- Execution Setup ---\n");
@@ -137,11 +147,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    printf("--- Output ---\n");
-
     print_results(find_queens(desk_size, timeout_ms, mode), output_mode);
-
-    if (input != stdin)
-        fclose(input);
     return 0;
 }

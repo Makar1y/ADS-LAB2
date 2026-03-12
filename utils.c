@@ -21,10 +21,11 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
     {
         printf("%s\n", buffer);
     }
+    fclose(head);
 
-    printf("<div class=\"results-count\">Found results: <strong id=\"resultCount\">%d</strong></div>", num_of_results);
+    printf("<div class=\"results-count\">Found results: <strong id=\"resultCount\">%d</strong></div>\n", num_of_results);
 
-    printf("<div class=\"results-container\">");
+    printf("<div class=\"results-container\">\n");
 
     for (int r = 0; r < num_of_results; ++r)
     {
@@ -36,35 +37,39 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
             desk[results[r][i][0]][results[r][i][1]] = 1;
         }
 
-        printf("<div class=\"result-card\"><div class=\"chessboard\">");
+        printf("<div class=\"result-card\"><div class=\"chessboard\">\n");
 
         for (int i = 0; i < desk_size; ++i)
         {
             for (int j = 0; j < desk_size; ++j)
             {
                 // <div class="cell white">♛</div>
-                printf("<div class=\"cell %s\">%s</div>",
+                printf("<div class=\"cell %s\">%s</div>\n",
                         (i + j) % 2 ? "white" : "black",
                         desk[i][j] ? PIECE : "");
 
             }
         }
 
-        printf("</div></div>");
+        printf("</div></div>\n");
     }
 
-    printf("</div></body></html>");
+    printf("</div></body></html>\n");
 }
 
 
-void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces)
+void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, long duration)
 {
     if (!results)
     {
         return;
     }
 
-    printf("Solutions found: %d\n", num_of_results);
+    printf("--- Output ---\n\n");
+
+    printf("Search duration: %ld ms\n", duration);
+
+    printf("Solutions found: %d\n\n", num_of_results);
 
     for (int r = 0; r < num_of_results; ++r)
     {

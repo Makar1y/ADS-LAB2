@@ -15,10 +15,9 @@ typedef struct
 
 typedef struct
 {
-    int **desk;
     int desk_size;
-    time_t start_time;
-    int timeout;
+    clock_t start_time;
+    long timeout;
     int is_full_search;
 
     int (*results)[QUEENS_NUM][2];
@@ -28,29 +27,35 @@ typedef struct
     int return_code;
 } Search;
 
-void find(Search *);
+void find_domination(Search *, int, int);
 
-int is_controlled(int **desk, int desk_size, int row, int col)
+int is_board_covered(Search *search)
 {
-    for (int i = 0; i < desk_size; ++i)
+    int size = search->desk_size;
+    for (int r = 0; r < size; ++r)
     {
-        for (int j = 0; j < desk_size; ++j)
+        for (int c = 0; c < size; ++c)
         {
-            if (desk[i][j])
+            int covered = 0;
+            for (int q = 0; q < QUEENS_NUM; ++q)
             {
-                if (i == row || j == col) return 1;
+                int qr = search->results[search->cur_solution][q][0];
+                int qc = search->results[search->cur_solution][q][1];
 
-                int delta_row = abs(i - row);
-                int delta_col = abs(j - col);
-                if (delta_row == delta_col) return 1;
+                if (qr == r || qc == c || abs(qr - r) == abs(qc - c))
+                {
+                    covered = 1;
+                    break;
+                }
             }
+            if (!covered)
+                return 0;
         }
     }
-    return 0;
+    return 1;
 }
 
-
-Results *find_queens(int desk_size, int timeout, int is_full_search)
+Results *find_queens(int desk_size, long timeout, int is_full_search)
 {
     if (desk_size <= 0)
     {
@@ -59,152 +64,115 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     }
     Search search = {0};
     int result_code;
-    time_t end_time;
+    clock_t end_time;
 
     search.desk_size = desk_size;
-    search.desk = malloc(desk_size * sizeof(int *));
-    for (int i = 0; i < desk_size; ++i)
-    {
-        search.desk[i] = calloc(desk_size, sizeof(int));
-    }
 
     search.results = malloc(sizeof(int[QUEENS_NUM][2]) * 2);
 
     search.is_full_search = is_full_search;
     search.return_code = SUCCESS_CODE;
 
-    if (!search.desk || !search.results)
+    if (!search.results)
     {
         fprintf(stderr, "Error allocating memory...\n");
         return NULL;
     }
 
-    search.timeout = timeout ? timeout / 1000.f : -1;
-    search.start_time = time(0);
+    search.timeout = timeout;
+    search.start_time = clock();
 
     DEBUG_PRINT("Starting search...");
 
-    find(&search);
-    end_time = time(0);
+    find_domination(&search, 0, 0);
+    end_time = clock();
 
-    DEBUG_PRINT("Search ended with %d results", search.cur_solution);
+    DEBUG_PRINT("Search ended with %d results and %s return code.", search.cur_solution);
 
-    result_code = search.return_code;
-
-    if (result_code == TIMEOUT_CODE)
-    {
-        printf("Timeout reached...\n\n");
-    }
-    else if (result_code == RUNTIME_ERROR)
+    if (search.return_code == RUNTIME_ERROR)
     {
         fprintf(stderr, "Error occurred while finding solutions...\n\n");
-        for (int i = 0; i < desk_size; i++)
-            free(search.desk[i]);
-        free(search.desk);
+
         free(search.results);
         return NULL;
     }
 
     Results *results_data = malloc(sizeof(Results));
 
-    results_data->duration = end_time - search.start_time;
+    results_data->duration = ((double)(end_time - search.start_time) / CLOCKS_PER_SEC) * 1000;
     results_data->results = search.results;
     results_data->how_solutions = search.cur_solution;
     results_data->desk_size = desk_size;
+    results_data->return_code = search.return_code;
 
     for (int i = 0; i < desk_size; i++)
-        free(search.desk[i]);
-    free(search.desk);
 
     return results_data;
 }
 
-void find(Search *search)
+void find_domination(Search *search, int start_index, int queens_placed)
 {
-
+    // Returning
     if (search->ended)
+        return;
+    if (search->timeout > 0) {
+        clock_t current_time = clock();
+        double elapsed_ms = ((double)(current_time - search->start_time) / CLOCKS_PER_SEC) * 10000;
+        
+        if (elapsed_ms > search->timeout) {
+            search->return_code = TIMEOUT_CODE;
+            search->ended = 1;
+            return;
+        }
+    }
+
+    // Save
+    if (queens_placed == QUEENS_NUM)
     {
+        if (is_board_covered(search))
+        {
+            ++search->cur_solution;
+
+            if (!search->is_full_search)
+            {
+                search->ended = 1;
+            }
+            else
+            {
+                void *tmp = realloc(search->results, sizeof(int[QUEENS_NUM][2]) * (search->cur_solution + 1));
+                if (!tmp)
+                {
+                    search->return_code = RUNTIME_ERROR;
+                    search->ended = 1;
+                    return;
+                }
+                search->results = tmp;
+                memcpy(search->results[search->cur_solution],
+                        search->results[search->cur_solution - 1],
+                        sizeof(int[QUEENS_NUM][2]));
+            }
+        }
         return;
     }
 
-    search->results[search->cur_solution][search->cur_level][0] = -1;
-    search->results[search->cur_solution][search->cur_level][1] = -1;
-
-    if (search->timeout < 0 || time(0) - search->start_time <= search->timeout)
+    // Main search
+    int total_cells = search->desk_size * search->desk_size;
+    for (int i = start_index; i < total_cells - (QUEENS_NUM - queens_placed); ++i)
     {
-        for (int i = 0; i < search->desk_size; ++i)
-        {
-            for (int j = 0; j < search->desk_size; ++j)
-            {
-                if (!is_controlled(search->desk, search->desk_size, i, j))
-                {
-                    search->desk[i][j] = 1;
-                    search->results[search->cur_solution][search->cur_level][0] = i;
-                    search->results[search->cur_solution][search->cur_level][1] = j;
+        int r = i / search->desk_size;
+        int c = i % search->desk_size;
 
-                    if (search->cur_level == QUEENS_NUM - 1)
-                    {
-                        if (!search->is_full_search)
-                        {
-                            search->ended = 1;
-                            ++search->cur_solution;
-                            DEBUG_PRINT("Sarch ended with first match. level: %d, solution: %d", search->cur_level, search->cur_solution);
-                            return;
-                        }
-                        else
-                        {
+        search->results[search->cur_solution][queens_placed][0] = r;
+        search->results[search->cur_solution][queens_placed][1] = c;
 
-                            void *tmp = realloc(search->results, sizeof(int[QUEENS_NUM][2]) * (search->cur_solution + 2));
+        find_domination(search, i + 1, queens_placed + 1);
 
-                            if (!tmp)
-                            {
-                                search->return_code = RUNTIME_ERROR;
-                                search->ended = 1;
-                                return;
-                            }
-
-                            search->results = tmp;
-
-                            memcpy(search->results[search->cur_solution + 1],
-                                   search->results[search->cur_solution],
-                                   sizeof(int[QUEENS_NUM][2]));
-
-                            search->desk[i][j] = 0;
-                            ++search->cur_solution;
-                            DEBUG_PRINT("Sarch found another solution. level: %d, solution: %d", search->cur_level, search->cur_solution);
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        ++search->cur_level;
-                        find(search);
-                        if (search->ended) {
-                            return;
-                        }
-                        search->desk[i][j] = 0;
-                    }
-                }
-            }
-        }
-
-        if (search->cur_level == 0)
-        {
+        if (search->ended)
             return;
-        }
-
-        --search->cur_level;
-        find(search);
-        if (search->ended) {
-            return;
-        }
     }
-    search->ended = 1;
-    search->return_code = TIMEOUT_CODE;
-    return;
 }
 
-int print_results(Results *results, int output_format)
+int print_results(Results * results, int output_format)
 {
     if (!results)
     {
@@ -212,15 +180,13 @@ int print_results(Results *results, int output_format)
         return INVALID_INPUT;
     }
 
-    printf("Search duration: %ld s\n", (long)results->duration);
-
     if (output_format)
     {
         results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size);
     }
     else
     {
-        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM);
+        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration);
     }
     return SUCCESS_CODE;
 }

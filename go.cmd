@@ -8,4 +8,9 @@ goto :run
 
 
 :HomePC
-make
+call make
+
+:run
+queens.exe - < tests/test1.txt > tests/result1.txt
+queens.exe tests/test2.txt > tests/result2.html
+queens.exe tests/test3.txt > tests/result3.html

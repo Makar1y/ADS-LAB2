@@ -8,7 +8,7 @@
 
 void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, int desk_size);
 
-void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces);
+void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, long duration);
 
 
 #endif
