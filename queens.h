@@ -11,6 +11,7 @@ typedef struct {
     int (*results)[QUEENS_NUM][2];
     int how_solutions;
     int return_code;
+    double progress;
 } Results;
 
 enum {

@@ -25,9 +25,10 @@ typedef struct
     int cur_level;
     int ended;
     int return_code;
+    double progress;
 } Search;
 
-void find_domination(Search *, int, int);
+void find_domination(Search *, int, int, double);
 
 int is_board_covered(Search *search)
 {
@@ -84,7 +85,7 @@ Results *find_queens(int desk_size, long timeout, int is_full_search)
 
     DEBUG_PRINT("Starting search...");
 
-    find_domination(&search, 0, 0);
+    find_domination(&search, 0, 0, 1.0);
     end_time = clock();
 
     DEBUG_PRINT("Search ended with %d results and %s return code.", search.cur_solution);
@@ -104,13 +105,12 @@ Results *find_queens(int desk_size, long timeout, int is_full_search)
     results_data->how_solutions = search.cur_solution;
     results_data->desk_size = desk_size;
     results_data->return_code = search.return_code;
-
-    for (int i = 0; i < desk_size; i++)
+    results_data->progress = search.progress;
 
     return results_data;
 }
 
-void find_domination(Search *search, int start_index, int queens_placed)
+void find_domination(Search *search, int start_index, int queens_placed, double weight)
 {
     // Returning
     if (search->ended)
@@ -157,7 +157,10 @@ void find_domination(Search *search, int start_index, int queens_placed)
 
     // Main search
     int total_cells = search->desk_size * search->desk_size;
-    for (int i = start_index; i < total_cells - (QUEENS_NUM - queens_placed); ++i)
+    int end_index = total_cells - (QUEENS_NUM - queens_placed);
+    int count = end_index - start_index;
+
+    for (int i = start_index; i < end_index; ++i)
     {
         int r = i / search->desk_size;
         int c = i % search->desk_size;
@@ -165,10 +168,12 @@ void find_domination(Search *search, int start_index, int queens_placed)
         search->results[search->cur_solution][queens_placed][0] = r;
         search->results[search->cur_solution][queens_placed][1] = c;
 
-        find_domination(search, i + 1, queens_placed + 1);
+        find_domination(search, i + 1, queens_placed + 1, weight / count);
 
         if (search->ended)
             return;
+        
+        search->progress += weight / count;
     }
 }
 
@@ -182,11 +187,11 @@ int print_results(Results * results, int output_format)
 
     if (output_format)
     {
-        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration);
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code==TIMEOUT_CODE, results->progress);
     }
     else
     {
-        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration);
+        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration, results->return_code==TIMEOUT_CODE, results->progress);
     }
     return SUCCESS_CODE;
 }

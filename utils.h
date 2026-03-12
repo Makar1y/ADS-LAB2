@@ -6,9 +6,9 @@
 #define PIECE "♛" // ♜ ♞ ♝ ♛ ♚
 
 
-void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, int desk_size, long duration);
+void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress);
 
-void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, long duration);
+void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, long duration, int timedout, double progress);
 
 
 #endif
