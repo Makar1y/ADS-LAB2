@@ -3,27 +3,28 @@
 #include <string.h>
 
 #include "queens.h"
+#include "DEBUG.H"
 
 // 2026.03.06
 
 #define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-desk_size cells_number] [-timeout miliseconds] [-o_format [html|cmd]]\n"
 
+
+
 int main(int argc, char *argv[])
 {
     char *filename = NULL;
     int output_mode = 0;
-    char output_modes[][10] = {
+    char output_modes[2][10] = {
         "cmd",
-        "html"
-    };
+        "html"};
     int mode = 0;
-    char modes[][20] = {
+    char modes[3][20] = {
         "firstMatchSearch",
         "fullSearch",
-        "heuristic"
-    };
+        "heuristic"};
     int heuristic_no = 3;
-    long timeout_ms = 3000;
+    long timeout_ms = -1;
     int desk_size = 8;
     FILE *input = stdin;
 
@@ -33,80 +34,92 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    for (int i = 1; i < argc; i++)
+    for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "-") != 0 && argv[i][0] != '-')
+        if (argv[i][0] == '-')
+        {
+            if (strcmp(argv[i], "-mode") == 0 && i + 1 < argc)
+            {
+                int exist = 0;
+                char *tmp = argv[++i];
+
+                for (int j = 0; j < 3; ++j)
+                {
+                    if (strcmp(modes[j], tmp) == 0)
+                    {
+                        exist = 1;
+                        mode = j;
+                        break;
+                    }
+                }
+
+                if (!exist)
+                {
+                    fprintf(stderr, "Mode %s not recognized.\n", tmp);
+                    fprintf(stderr, USAGE_MESSAGE, argv[0]);
+                    exit(1);
+                }
+
+                if (strcmp(tmp, "heuristic") == 0 && i + 1 < argc)
+                {
+                    heuristic_no = atoi(argv[++i]);
+                }
+            }
+
+            else if (strcmp(argv[i], "-o_format") == 0 && i + 1 < argc)
+            {
+                int exist = 0;
+                char *tmp = argv[++i];
+
+                for (int j = 0; j < 2; ++j)
+                {
+                    if (strcmp(output_modes[j], tmp) == 0)
+                    {
+                        output_mode = j;
+                        exist = 1;
+                        break;
+                    }
+                }
+
+                if (!exist)
+                {
+                    fprintf(stderr, "Output format %s not recognized.\n", tmp);
+                    fprintf(stderr, USAGE_MESSAGE, argv[0]);
+                    exit(1);
+                }
+            }
+
+            else if (strcmp(argv[i], "-timeout") == 0 && i + 1 < argc)
+            {
+                timeout_ms = atol(argv[++i]);
+                timeout_ms = abs(timeout_ms);
+            }
+
+            else if (strcmp(argv[i], "-desk_size") == 0 && i + 1 < argc)
+            {
+                desk_size = abs(atoi(argv[++i]));
+            }
+            else
+            {
+                fprintf(stderr, "Argument %s not recognized.\n", argv[i]);
+                fprintf(stderr, USAGE_MESSAGE, argv[0]);
+                exit(1);
+            }
+        }
+        else
         {
             filename = argv[i];
             input = fopen(filename, "r");
+
             if (!input)
             {
-                perror("Error opening file");
-                return 1;
+                perror("Error opening input file");
+                exit(1);
             }
-        }
-
-        else if (strcmp(argv[i], "-mode") == 0 && i + 1 < argc)
-        {
-            int exist = 0;
-            char *tmp = argv[++i];
-
-            for (int j = 0; j < 3; --j)
-            {
-                if (strcmp(modes[j], tmp) == 0)
-                {
-                    exist = 1;
-                    mode = j;
-                    break;
-                }
-            }
-
-            if (!exist)
-            {
-                fprintf(stderr, "Mode %s not recognized.\n", tmp);
-                fprintf(stderr, USAGE_MESSAGE, argv[0]);
-            }
-
-            if (strcmp(tmp, "heuristic") == 0 && i + 1 < argc)
-            {
-                heuristic_no = atoi(argv[++i]);
-            }
-        }
-
-        else if (strcmp(argv[i], "-o_format") == 0 && i + 1 < argc)
-        {
-            int exist = 0;
-            char *tmp = argv[++i];
-
-            for (int j = 0; j < 2; --j)
-            {
-                if (strcmp(output_modes[j], tmp) == 0)
-                {
-                    output_mode = j;
-                    exist = 1;
-                    break;
-                }
-            }
-
-            if (!exist)
-            {
-                fprintf(stderr, "Output format %s not recognized.\n", tmp);
-                fprintf(stderr, USAGE_MESSAGE, argv[0]);
-            }
-        }
-
-        else if (strcmp(argv[i], "-timeout") == 0 && i + 1 < argc)
-        {
-            timeout_ms = atol(argv[++i]);
-            timeout_ms = abs(timeout_ms);
-        }
-        
-        else if (strcmp(argv[i], "-desk_size") == 0 && i + 1 < argc)
-        {
-            desk_size = atol(argv[++i]);
-            desk_size = abs(desk_size);
         }
     }
+
+
 
     // Inform the user about data
     printf("--- Execution Setup ---\n");

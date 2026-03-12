@@ -6,6 +6,7 @@
 
 #include "utils.h"
 #include "queens.h"
+#include "DEBUG.H"
 
 typedef struct
 {
@@ -33,43 +34,21 @@ int is_controlled(int **desk, int desk_size, int row, int col)
 {
     for (int i = 0; i < desk_size; ++i)
     {
-        if (desk[i][col] || desk[row][i])
+        for (int j = 0; j < desk_size; ++j)
         {
-            return True;
+            if (desk[i][j])
+            {
+                if (i == row || j == col) return 1;
+
+                int delta_row = abs(i - row);
+                int delta_col = abs(j - col);
+                if (delta_row == delta_col) return 1;
+            }
         }
     }
-
-    int max_coord = row > col ? row : col;
-    Cell dig1 = {row - max_coord, col - max_coord};
-    Cell dig2 = {0, row + col};
-
-    while (((dig1.col >= 0 && dig1.col < desk_size) &&
-            (dig1.row >= 0 && dig1.row < desk_size)) ||
-           ((dig2.col >= 0 && dig2.col < desk_size) &&
-            (dig2.row >= 0 && dig2.row < desk_size)))
-    {
-        if (dig1.row < desk_size && dig1.row >= 0 && dig1.col < desk_size && dig1.col >= 0)
-        {
-            if (desk[dig1.row][dig1.col])
-            {
-                return True;
-            }
-            ++dig1.row;
-            ++dig1.col;
-        }
-        if (dig2.row < desk_size && dig2.col < desk_size && dig2.row >= 0 && dig2.col >= 0)
-        {
-            if (desk[dig2.row][dig2.col])
-            {
-                return True;
-            }
-            --dig2.row;
-            ++dig2.col;
-        }
-    }
-
     return 0;
 }
+
 
 Results *find_queens(int desk_size, int timeout, int is_full_search)
 {
@@ -103,16 +82,12 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
     search.timeout = timeout ? timeout / 1000.f : -1;
     search.start_time = time(0);
 
-#ifdef DEBUG
-    printf("Starting search...\n");
-#endif
+    DEBUG_PRINT("Starting search...");
 
     find(&search);
     end_time = time(0);
 
-#ifdef DEBUG
-    printf("Search ended.\n");
-#endif
+    DEBUG_PRINT("Search ended with %d results", search.cur_solution);
 
     result_code = search.return_code;
 
@@ -146,9 +121,6 @@ Results *find_queens(int desk_size, int timeout, int is_full_search)
 
 void find(Search *search)
 {
-#ifdef DEBUG
-    assert(search);
-#endif
 
     if (search->ended)
     {
@@ -176,6 +148,7 @@ void find(Search *search)
                         {
                             search->ended = 1;
                             ++search->cur_solution;
+                            DEBUG_PRINT("Sarch ended with first match. level: %d, solution: %d", search->cur_level, search->cur_solution);
                             return;
                         }
                         else
@@ -198,6 +171,7 @@ void find(Search *search)
 
                             search->desk[i][j] = 0;
                             ++search->cur_solution;
+                            DEBUG_PRINT("Sarch found another solution. level: %d, solution: %d", search->cur_level, search->cur_solution);
                             continue;
                         }
                     }
@@ -205,6 +179,9 @@ void find(Search *search)
                     {
                         ++search->cur_level;
                         find(search);
+                        if (search->ended) {
+                            return;
+                        }
                         search->desk[i][j] = 0;
                     }
                 }
@@ -218,6 +195,9 @@ void find(Search *search)
 
         --search->cur_level;
         find(search);
+        if (search->ended) {
+            return;
+        }
     }
     search->ended = 1;
     search->return_code = TIMEOUT_CODE;

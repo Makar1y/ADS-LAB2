@@ -13,6 +13,10 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
     char buffer[500];
 
     FILE *head = fopen("templates/head.html", "r");
+    if (head == NULL) {
+        fprintf(stderr, "Error openning template for html output.\n");
+        return;
+    }
     while (fgets(buffer, BUFFER_SIZE, head))
     {
         printf("%s\n", buffer);
@@ -24,7 +28,10 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
 
     for (int r = 0; r < num_of_results; ++r)
     {
-        int **desk = calloc(desk_size, desk_size * sizeof(int));
+        int desk[desk_size][desk_size];
+        for(int x=0; x<desk_size; x++) 
+            for(int y=0; y<desk_size; y++) desk[x][y] = 0;
+
         for (int i = 0; i < num_of_pieces; ++i) {
             desk[results[r][i][0]][results[r][i][1]] = 1;
         }
@@ -37,8 +44,8 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
             {
                 // <div class="cell white">♛</div>
                 printf("<div class=\"cell %s\">%s</div>",
-                        i + j % 2 ? "white" : "black",
-                        desk[i][j] ? "♛" : "");
+                        (i + j) % 2 ? "white" : "black",
+                        desk[i][j] ? PIECE : "");
 
             }
         }
