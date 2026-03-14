@@ -4,15 +4,15 @@
 #define QUEENS_NUM 5
 #define PIECE_SYMBOL "♛"
 
-/// @brief Structure for comfort results storing
+/// @brief Structure to store the results of the search
 typedef struct
 {
-    int desk_size;
-    long duration;
-    int (*results)[QUEENS_NUM][2];
-    int how_solutions;
-    int return_code;
-    double progress;
+    int desk_size;                  // Size of the game board
+    long duration;                  // Execution time in milliseconds
+    int (*results)[QUEENS_NUM][2];  // Array of found solutions
+    int how_solutions;              // Total count of solutions found
+    int return_code;                // Result status code
+    double progress;                // Search progress (0.0 to 1.0)
 } Results;
 
 /// @brief Return codes
@@ -26,17 +26,17 @@ enum
     RUNTIME_ERROR
 };
 
-/// @brief
-/// @param desk_size
-/// @param timeout
-/// @param is_full_search
-/// @return
+/// @brief Finds queen positions that cover (dominate) the entire board
+/// @param desk_size The dimension of the square board
+/// @param timeout Maximum execution time in milliseconds (0 for no limit)
+/// @param is_full_search If true (1), find all solutions; if false (0), stop after first
+/// @return Pointer to Results structure, or NULL on failure
 Results *find_queens(int desk_size, long timeout, int is_full_search);
 
-/// @brief
-/// @param results
-/// @param output_format
-/// @return
+/// @brief Outputs the search results to the console
+/// @param results Pointer to the Results structure to print
+/// @param output_format 0 for console (CMD), 1 for HTML file
+/// @return SUCCESS_CODE (100) if printed, otherwise an error code
 int print_results(Results *results, int output_format);
 
 #endif
