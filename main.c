@@ -5,7 +5,6 @@
 #include "queens.h"
 #include "DEBUG.H"
 
-// 2026.03.06
 
 #define USAGE_MESSAGE "Usage: %s [-|failo_vardas] [-mode [fullSearch|firstMatchSearch|heuristic heuristic_number]] [-desk_size cells_number] [-timeout miliseconds] [-of [html|cmd]]\n"
 #define FILE_INPUT_USAGE "file/std input format: [desk_size] [mode(0|1|2)] [of(0|1)] [timeout_ms]"
