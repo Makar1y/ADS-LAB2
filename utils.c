@@ -13,7 +13,8 @@ void results_to_html(int **results[2], int num_of_results, int num_of_pieces, in
     char buffer[BUFFER_SIZE];
 
     FILE *head = fopen("templates/head.html", "r");
-    if (head == NULL) {
+    if (head == NULL)
+    {
         fprintf(stderr, "Error opening template for html output.\n");
         return;
     }
@@ -27,29 +28,36 @@ void results_to_html(int **results[2], int num_of_results, int num_of_pieces, in
     printf("\t<div>Solutions Found: <strong>%d</strong></div>\n", num_of_results);
     printf("\t<div style=\"color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;\">\n");
     printf("\t\tSearch Duration: %ld ms\n", duration, desk_size, desk_size);
-    if (timedout) {
+    if (timedout)
+    {
         printf("\t\t<br><span style=\"color: var(--queen-color); font-weight: 600;\">TIMEOUT! Exploration: %.2f%%</span>\n", progress);
     }
     printf("\t</div>\n");
     printf("</div>\n");
 
-    if (num_of_results == 0) {
+    if (num_of_results == 0)
+    {
         printf("<div class=\"no-results\">No solutions found for this configuration.</div>\n");
-    } else {
+    }
+    else
+    {
         printf("<div class=\"results-container\">\n");
 
         for (int r = 0; r < num_of_results; ++r)
         {
             int *desk = (int *)calloc(desk_size * desk_size, sizeof(int));
-            if (!desk) {
+            if (!desk)
+            {
                 fprintf(stderr, "Memory allocation failed in results_to_html\n");
                 return;
             }
 
-            for (int i = 0; i < num_of_pieces; ++i) {
+            for (int i = 0; i < num_of_pieces; ++i)
+            {
                 int row = results[r][i][0];
                 int col = results[r][i][1];
-                if (row >= 0 && row < desk_size && col >= 0 && col < desk_size) {
+                if (row >= 0 && row < desk_size && col >= 0 && col < desk_size)
+                {
                     desk[row * desk_size + col] = 1;
                 }
             }
@@ -64,9 +72,9 @@ void results_to_html(int **results[2], int num_of_results, int num_of_pieces, in
                 {
                     int is_piece = desk[i * desk_size + j];
                     printf("\t\t<div class=\"cell %s %s\">%s</div>\n",
-                            (i + j) % 2 ? "white" : "black",
-                            is_piece ? "has-piece" : "",
-                            is_piece ? PIECE : "");
+                           (i + j) % 2 ? "white" : "black",
+                           is_piece ? "has-piece" : "",
+                           is_piece ? PIECE : "");
                 }
             }
 
@@ -80,7 +88,6 @@ void results_to_html(int **results[2], int num_of_results, int num_of_pieces, in
     printf("</body></html>\n");
 }
 
-
 void results_to_cmd(int **results[2], int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
 {
     if (!results)
@@ -91,7 +98,8 @@ void results_to_cmd(int **results[2], int num_of_results, int num_of_pieces, lon
     printf("--- Output ---\n\n");
 
     printf("Search duration: %ld ms\n", duration);
-    if (timedout) {
+    if (timedout)
+    {
         printf("SEARCH STOPPED DUE TO TIMEOUT!\n");
         printf("Explored: %.2f%% of the search space.\n", progress);
     }
@@ -102,7 +110,8 @@ void results_to_cmd(int **results[2], int num_of_results, int num_of_pieces, lon
     {
         printf("Result No. %d\n", r + 1);
         printf("[");
-        for (int i = 0; i < num_of_pieces; ++i) {
+        for (int i = 0; i < num_of_pieces; ++i)
+        {
             printf("%c%d,", results[r][i][0] + 97, results[r][i][1]);
         }
         printf("]\n\n");

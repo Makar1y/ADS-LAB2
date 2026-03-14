@@ -19,7 +19,6 @@ typedef struct
     clock_t start_time;
     long timeout;
     int is_full_search;
-
     int (*results)[QUEENS_NUM][2];
     int cur_solution;
     int cur_level;
@@ -50,7 +49,9 @@ int is_board_covered(Search *search)
                 }
             }
             if (!covered)
+            {
                 return 0;
+            }
         }
     }
     return 1;
@@ -114,12 +115,16 @@ void find_domination(Search *search, int start_index, int queens_placed, double 
 {
     // Returning
     if (search->ended)
+    {
         return;
-    if (search->timeout > 0) {
+    }
+    if (search->timeout > 0)
+    {
         clock_t current_time = clock();
         double elapsed_ms = ((double)(current_time - search->start_time) / CLOCKS_PER_SEC) * 1000;
-        
-        if (elapsed_ms > search->timeout) {
+
+        if (elapsed_ms > search->timeout)
+        {
             search->return_code = TIMEOUT_CODE;
             search->ended = 1;
             return;
@@ -148,8 +153,8 @@ void find_domination(Search *search, int start_index, int queens_placed, double 
                 }
                 search->results = tmp;
                 memcpy(search->results[search->cur_solution],
-                        search->results[search->cur_solution - 1],
-                        sizeof(int[QUEENS_NUM][2]));
+                       search->results[search->cur_solution - 1],
+                       sizeof(int[QUEENS_NUM][2]));
             }
         }
         return;
@@ -171,13 +176,15 @@ void find_domination(Search *search, int start_index, int queens_placed, double 
         find_domination(search, i + 1, queens_placed + 1, weight / count);
 
         if (search->ended)
+        {
             return;
-        
+        }
+
         search->progress += weight / count;
     }
 }
 
-int print_results(Results * results, int output_format)
+int print_results(Results *results, int output_format)
 {
     if (!results)
     {
@@ -187,11 +194,11 @@ int print_results(Results * results, int output_format)
 
     if (output_format)
     {
-        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code==TIMEOUT_CODE, results->progress * 100.0);
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code == TIMEOUT_CODE, results->progress * 100.0);
     }
     else
     {
-        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration, results->return_code==TIMEOUT_CODE, results->progress * 100.0);
+        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration, results->return_code == TIMEOUT_CODE, results->progress * 100.0);
     }
     return SUCCESS_CODE;
 }
