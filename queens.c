@@ -187,11 +187,11 @@ int print_results(Results * results, int output_format)
 
     if (output_format)
     {
-        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code==TIMEOUT_CODE, results->progress);
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code==TIMEOUT_CODE, results->progress * 100.0);
     }
     else
     {
-        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration, results->return_code==TIMEOUT_CODE, results->progress);
+        results_to_cmd(results->results, results->how_solutions, QUEENS_NUM, results->duration, results->return_code==TIMEOUT_CODE, results->progress * 100.0);
     }
     return SUCCESS_CODE;
 }

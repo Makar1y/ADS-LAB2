@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress)
+void results_to_html(int **results[2], int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress)
 {
     if (!results)
     {
@@ -28,7 +28,7 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
     printf("\t<div style=\"color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;\">\n");
     printf("\t\tSearch Duration: %ld ms\n", duration, desk_size, desk_size);
     if (timedout) {
-        printf("\t\t<br><span style=\"color: var(--queen-color); font-weight: 600;\">TIMEOUT! Exploration: %.2f%%</span>\n", progress * 100.0);
+        printf("\t\t<br><span style=\"color: var(--queen-color); font-weight: 600;\">TIMEOUT! Exploration: %.2f%%</span>\n", progress);
     }
     printf("\t</div>\n");
     printf("</div>\n");
@@ -81,7 +81,7 @@ void results_to_html(int (*results)[NUM_OF_PIECES][2], int num_of_results, int n
 }
 
 
-void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
+void results_to_cmd(int **results[2], int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
 {
     if (!results)
     {
@@ -93,7 +93,7 @@ void results_to_cmd(int (*results)[NUM_OF_PIECES][2], int num_of_results, int nu
     printf("Search duration: %ld ms\n", duration);
     if (timedout) {
         printf("SEARCH STOPPED DUE TO TIMEOUT!\n");
-        printf("Explored: %.2f%% of the search space.\n", progress * 100.0);
+        printf("Explored: %.2f%% of the search space.\n", progress);
     }
 
     printf("Solutions found: %d\n\n", num_of_results);
