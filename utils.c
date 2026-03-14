@@ -4,12 +4,13 @@
 
 #include "utils.h"
 
-void results_to_html(int ***results, int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress)
+void results_to_html(const void *results_ptr, int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress, const char *piece_symbol)
 {
-    if (!results)
+    if (!results_ptr)
     {
         return;
     }
+    const int (*results)[num_of_pieces][2] = (const int (*)[num_of_pieces][2])results_ptr;
     char buffer[BUFFER_SIZE];
 
     FILE *head = fopen("templates/head.html", "r");
@@ -27,7 +28,7 @@ void results_to_html(int ***results, int num_of_results, int num_of_pieces, int 
     printf("<div class=\"stats\">\n");
     printf("\t<div>Solutions Found: <strong>%d</strong></div>\n", num_of_results);
     printf("\t<div style=\"color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;\">\n");
-    printf("\t\tSearch Duration: %ld ms\n", duration, desk_size, desk_size);
+    printf("\t\tSearch Duration: %ld ms\n", duration);
     if (timedout)
     {
         printf("\t\t<br><span style=\"color: var(--queen-color); font-weight: 600;\">TIMEOUT! Exploration: %.2f%%</span>\n", progress);
@@ -74,7 +75,7 @@ void results_to_html(int ***results, int num_of_results, int num_of_pieces, int 
                     printf("\t\t<div class=\"cell %s %s\">%s</div>\n",
                            (i + j) % 2 ? "white" : "black",
                            is_piece ? "has-piece" : "",
-                           is_piece ? PIECE : "");
+                           is_piece ? piece_symbol : "");
                 }
             }
 
@@ -88,12 +89,13 @@ void results_to_html(int ***results, int num_of_results, int num_of_pieces, int 
     printf("</body></html>\n");
 }
 
-void results_to_cmd(int ***results, int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
+void results_to_cmd(const void *results_ptr, int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
 {
-    if (!results)
+    if (!results_ptr)
     {
         return;
     }
+    const int (*results)[num_of_pieces][2] = (const int (*)[num_of_pieces][2])results_ptr;
 
     printf("--- Output ---\n\n");
 
@@ -112,7 +114,8 @@ void results_to_cmd(int ***results, int num_of_results, int num_of_pieces, long 
         printf("[");
         for (int i = 0; i < num_of_pieces; ++i)
         {
-            printf("%c%d,", results[r][i][0] + 97, results[r][i][1]);
+            printf("%c%d", results[r][i][0] + 97, results[r][i][1] + 1);
+            if (i < num_of_pieces - 1) printf(", ");
         }
         printf("]\n\n");
     }

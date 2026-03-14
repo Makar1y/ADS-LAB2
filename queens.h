@@ -2,6 +2,7 @@
 #define QUEENS_H
 
 #define QUEENS_NUM 5
+#define PIECE_SYMBOL "♛"
 
 /// @brief Structure for comfort results storing
 typedef struct

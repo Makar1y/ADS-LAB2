@@ -89,7 +89,7 @@ Results *find_queens(int desk_size, long timeout, int is_full_search)
     find_domination(&search, 0, 0, 1.0);
     end_time = clock();
 
-    DEBUG_PRINT("Search ended with %d results and %s return code.", search.cur_solution);
+    DEBUG_PRINT("Search ended with %d results and %d return code.", search.cur_solution, search.return_code);
 
     if (search.return_code == RUNTIME_ERROR)
     {
@@ -194,7 +194,7 @@ int print_results(Results *results, int output_format)
 
     if (output_format)
     {
-        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code == TIMEOUT_CODE, results->progress * 100.0);
+        results_to_html(results->results, results->how_solutions, QUEENS_NUM, results->desk_size, results->duration, results->return_code == TIMEOUT_CODE, results->progress * 100.0, PIECE_SYMBOL);
     }
     else
     {
