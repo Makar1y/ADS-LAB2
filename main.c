@@ -146,13 +146,14 @@ int main(int argc, char *argv[])
 
     printf("Search mode: %s", modes[mode]);
     if (mode == 2)
-    {
         printf(" (Number: %d)", heuristic_no);
-    }
     if (output_mode == 1)
         printf("<br>");
 
-    printf("\nTimeout: %ld ms\n", timeout_ms);
+    if (timeout_ms)
+        printf("\nTimeout: %ld ms\n", timeout_ms);
+    else
+        printf("\nWithout timeout\n", timeout_ms);
     if (output_mode == 1)
         printf("<br>");
 
