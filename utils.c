@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-void results_to_html(int **results[2], int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress)
+void results_to_html(int ***results, int num_of_results, int num_of_pieces, int desk_size, long duration, int timedout, double progress)
 {
     if (!results)
     {
@@ -88,7 +88,7 @@ void results_to_html(int **results[2], int num_of_results, int num_of_pieces, in
     printf("</body></html>\n");
 }
 
-void results_to_cmd(int **results[2], int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
+void results_to_cmd(int ***results, int num_of_results, int num_of_pieces, long duration, int timedout, double progress)
 {
     if (!results)
     {
