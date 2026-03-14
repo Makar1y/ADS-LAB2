@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
             if (fscanf(input, "%d %d %d %ld", &desk_size, &mode, &output_mode, &timeout_ms) != 4)
             {
                 printf("Invalid arguments count from file (should be 4)\n%s\n", FILE_INPUT_USAGE);
+                fclose(input);
                 exit(1);
             };
             fclose(input);
@@ -171,6 +172,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    print_results(find_queens(desk_size, timeout_ms, mode), output_mode);
+    Results *res = find_queens(desk_size, timeout_ms, mode);
+    print_results(res, output_mode);
+    if (res)
+    {
+        free(res->results);
+        free(res);
+    }
     return 0;
 }

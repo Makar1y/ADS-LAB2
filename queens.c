@@ -100,6 +100,12 @@ Results *find_queens(int desk_size, long timeout, int is_full_search)
     }
 
     Results *results_data = malloc(sizeof(Results));
+    if (!results_data)
+    {
+        fprintf(stderr, "Error allocating memory for results...\n");
+        free(search.results);
+        return NULL;
+    }
 
     results_data->duration = ((double)(end_time - search.start_time) / CLOCKS_PER_SEC) * 1000;
     results_data->results = search.results;
