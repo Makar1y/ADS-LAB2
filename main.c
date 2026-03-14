@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     if (output_mode == 1)
         printf("<br>");
 
-    printf("Input source: %s\n", filename ? (strcmp(filename, "-") == 0 ? "cmd" : filename) : "Standard Input");
+    printf("Input source: %s\n", filename ? (strcmp(filename, "-") == 0 ? "Standard Input" : filename) : "cmd");
     if (output_mode == 1)
         printf("<br>");
 
